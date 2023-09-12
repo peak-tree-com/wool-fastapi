@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "CNG"
+version = "0.1.0"
+description = ""
+authors = ["Krithick Jegatheesan <j.krithick@gmail.com>"]
+readme = "README.md"
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.101.0"
+uvicorn = "^0.23.2"
+SQLAlchemy = "^2.0.19"
+psycopg2-binary = "^2.9.7"
+alembic = "^1.12.0"
+sqlalchemy-utils = "^0.41.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+start = "main:start"

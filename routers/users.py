@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Annotated
+from fastapi import APIRouter, Depends, HTTPException, status
 from db.dbConfig import get_db
 from db.pymodels.users import User_In, User_Out
 from sqlalchemy.orm import Session
 import dao.userDao as userCrud
+from middleware.auth import get_current_user
 
 router = APIRouter(
     prefix="/api/users",
@@ -10,8 +12,10 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+user_dependency = Annotated[dict, Depends(get_current_user)]
 
-@router.post("/createUser", response_model=User_Out, status_code=201)
+
+@router.post("/signup", response_model=User_Out, status_code=status.HTTP_201_CREATED)
 async def createUser(user: User_In, db: Session = Depends(get_db)):
     db_user = userCrud.get_user_by_email(email=user.email, db=db)
     if db_user:
@@ -20,7 +24,12 @@ async def createUser(user: User_In, db: Session = Depends(get_db)):
     return userCrud.create_user(db=db, user=user)
 
 
-@router.get("/getUserById/{user_id}", status_code=200)
+@router.get("/login", status_code=status.HTTP_200_OK)
+async def loginUser(user: user_dependency):
+    return user
+
+
+@router.get("/getUserById/{user_id}", status_code=status.HTTP_200_OK)
 async def getUserById(user_id: int, db: Session = Depends(get_db)):
     db_user = userCrud.get_user(user_id=user_id, db=db)
     if db_user is None:
@@ -59,7 +68,7 @@ async def UpdateUserById(
 
 @router.delete("/deleteUserById/{user_id}")
 async def deleteUserById(user_id: int, db: Session = Depends(get_db)):
-    db_user = userCrud.get_user(user_id=user_id, db=db)  # getting object
+    db_user = userCrud.get_user_by_id(user_id=user_id, db=db)  # getting object
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return userCrud.delete_user(db=db, user_id=user_id)  # deleting the retrieved

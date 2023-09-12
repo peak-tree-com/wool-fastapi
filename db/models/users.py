@@ -18,12 +18,13 @@ from sqlalchemy.orm import relationship
 class Sex(Enum):
     female = 0
     male = 1
+    others = 2
 
 
 class Role(Enum):
-    retrofit_centre = 0
-    cng_consumer = 1
-    cng_provider = 2
+    guest = 0
+    buyer = 1
+    seller = 2
 
 
 class User(Timestamp, Base):
@@ -31,9 +32,10 @@ class User(Timestamp, Base):
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(EmailType, nullable=False)
-    password = Column(String)
+    hashed_password = Column(String)
     role = Column(SQLAlchemyEnum(Role))
     is_active = Column(Boolean, default=True)
+    username = Column(String, nullable=False, unique=True)
 
     profile = relationship("Profile", back_populates="owner", uselist=False)
 
@@ -48,4 +50,5 @@ class Profile(Timestamp, Base):
     gender = Column(SQLAlchemyEnum(Sex))
     bio = Column(Text, nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
     owner = relationship("User", back_populates="profile")

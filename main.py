@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 import uvicorn
 
@@ -5,6 +6,10 @@ from db.dbConfig import engine
 from db.models import users
 
 from routers import users as apiUsers
+from routers import auth
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # drop tables
 users.Base.metadata.drop_all(engine)
@@ -27,8 +32,14 @@ app = FastAPI(
 )
 
 app.include_router(apiUsers.router)
+app.include_router(auth.router)
 
 
 def start():
     """Launched with `poetry run start` at root level"""
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run(
+        "main:app",
+        host=os.getenv("LOCALHOST"),
+        port=int(os.getenv("PORT")),
+        reload=True,
+    )

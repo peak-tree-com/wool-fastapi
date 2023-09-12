@@ -7,6 +7,7 @@ from db.models.users import Role
 
 
 class UserBase(BaseModel):
+    username: Optional[str] = None
     email: Optional[str] = None
     role: Optional[Role] = None
 
